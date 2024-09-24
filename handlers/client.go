@@ -11,6 +11,7 @@ import (
 
 func StartClient(user *User) {
 	serverPort := os.Getenv("PORT")
+	serverHost := os.Getenv("DB_HOST")
 
 	opts := &socketio_client.Options{
 		Transport: "websocket",
@@ -22,7 +23,7 @@ func StartClient(user *User) {
 	opts.Query["pwd"] = user.Password
 	opts.Query["room"] = "test"
 
-	uri := fmt.Sprintf("http://127.0.0.1:%v/socket.io/", serverPort)
+	uri := fmt.Sprintf("http://%v:%v/socket.io/", serverHost, serverPort)
 
 	client, err := socketio_client.NewClient(uri, opts)
 	if err != nil {

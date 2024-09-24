@@ -17,9 +17,7 @@ var serverCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		serverPort := os.Getenv("PORT")
 
-		go func() {
-			handlers.StartServer()
-		}()
+		handlers.StartServer()
 
 		log.Printf("Starting server on port %v...", serverPort)
 
