@@ -22,4 +22,5 @@ func init() {
 	rootCmd.AddCommand(registerCmd)
 	rootCmd.AddCommand(loginCmd)
 	rootCmd.AddCommand(serverCmd)
+	rootCmd.AddCommand(historyCmd)
 }

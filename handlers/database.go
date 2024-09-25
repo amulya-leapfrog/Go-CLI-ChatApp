@@ -88,3 +88,55 @@ func SaveChatMessage(message string, sender string) error {
 	_, err := chatCollection.InsertOne(context.TODO(), chat)
 	return err
 }
+
+func FetchChatHistory() ([]ChatHistoryOutput, error) {
+	pipeline := mongo.Pipeline{
+		{
+			{Key: "$addFields", Value: bson.D{
+				{Key: "senderObjectID", Value: bson.D{
+					{Key: "$toObjectId", Value: "$sender"},
+				}},
+			}},
+		},
+		{
+			{Key: "$lookup", Value: bson.D{
+				{Key: "from", Value: "users"},
+				{Key: "localField", Value: "senderObjectID"},
+				{Key: "foreignField", Value: "_id"},
+				{Key: "as", Value: "senderInfo"},
+			}},
+		},
+		{
+			{Key: "$unwind", Value: bson.D{
+				{Key: "path", Value: "$senderInfo"},
+				{Key: "preserveNullAndEmptyArrays", Value: false},
+			}},
+		},
+		{
+			{Key: "$project", Value: bson.D{
+				{Key: "_id", Value: 1},
+				{Key: "message", Value: 1},
+				{Key: "timestamp", Value: 1},
+				{Key: "senderInfo.username", Value: 1},
+				{Key: "senderInfo.email", Value: 1},
+			}},
+		},
+	}
+
+	history, err := chatCollection.Aggregate(context.TODO(), pipeline)
+	if err != nil {
+		return nil, err
+	}
+
+	var chatData []ChatHistoryOutput
+	for history.Next(context.TODO()) {
+		var chat ChatHistoryOutput
+		err := history.Decode(&chat)
+		if err != nil {
+			return nil, err
+		}
+		chatData = append(chatData, chat)
+	}
+
+	return chatData, nil
+}

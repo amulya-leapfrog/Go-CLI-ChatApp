@@ -15,3 +15,15 @@ type ChatMessage struct {
 	Sender    string    `bson:"sender"`
 	Timestamp time.Time `bson:"timestamp"`
 }
+
+type SenderInfo struct {
+	Email    string `bson:"email"`
+	Username string `bson:"username"`
+}
+
+type ChatHistoryOutput struct {
+	ID         string     `bson:"_id,omitempty"`
+	Message    string     `bson:"message"`
+	SenderInfo SenderInfo `bson:"senderInfo"`
+	Timestamp  time.Time  `bson:"timestamp"`
+}
